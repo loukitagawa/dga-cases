@@ -1,42 +1,30 @@
-import './PfasTable.css'
+﻿import { Files } from "lucide-react";
+import CaseTable from "../CaseTable/CaseTable";
+import "./PfasTable.css";
 
-function PfasTable() {
+const COLUMNS = [
+  { key: "name", label: "Name" },
+  { key: "pwsid", label: "PWSID" },
+  { key: "caseNumber", label: "Case number" },
+  { key: "dateFiled", label: "Date filed" },
+  { key: "filer", label: "Filer" },
+  { key: "dropboxUploaded", label: "Dropbox uploaded", checkbox: true },
+  { key: "filed", label: "Filed", checkbox: true }
+];
+
+function PfasTable({ records, loading, error }) {
   return (
-    <section className="case-table-card pfas-table-card" aria-labelledby="pfas-heading">
-      <div className="case-table-heading">
-        <div className="case-table-title">
-          <span className="case-table-symbol">PF</span>
-          <div>
-            <h2 id="pfas-heading">PFAS</h2>
-            <p>Filed case records</p>
-          </div>
-        </div>
-        <span className="table-record-label">Awaiting records</span>
-      </div>
-      <div className="table-scroll">
-        <table className="case-table" aria-label="PFAS filed cases">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Case number</th>
-              <th scope="col">Date filed</th>
-              <th scope="col">Filer</th>
-              <th scope="col">Drop box uploaded</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="placeholder-row">
-              <td>--</td>
-              <td>--</td>
-              <td>--</td>
-              <td>--</td>
-              <td>--</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  )
+    <CaseTable
+      id="pfas"
+      title="PFAS"
+      description="Filed case records"
+      icon={Files}
+      columns={COLUMNS}
+      records={records}
+      loading={loading}
+      error={error}
+    />
+  );
 }
 
-export default PfasTable
+export default PfasTable;

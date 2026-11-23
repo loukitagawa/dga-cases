@@ -1,44 +1,73 @@
-import './SmaTable.css'
+﻿import { ClipboardList } from "lucide-react";
+import CaseTable from "../CaseTable/CaseTable";
+import "./SmaTable.css";
 
-function SmaTable() {
+const COLUMNS = [
+  { key: "fullName", label: "Full Name" },
+  { key: "plaintiff", label: "Plaintiff" },
+  { key: "caseNumber", label: "Case number" },
+  { key: "filer", label: "Filer" },
+  {
+    key: "shortFormComplaint",
+    label: "Short Form Complaint (Dropbox)",
+    checkbox: true
+  },
+  {
+    key: "civilCoverSheet",
+    label: "Civil Cover Sheet (Dropbox)",
+    checkbox: true
+  },
+  {
+    key: "ecf",
+    label: "ECF (Dropbox)",
+    checkbox: true
+  },
+  {
+    key: "summons",
+    label: "Summons (Dropbox)",
+    checkbox: true
+  },
+  {
+    key: "filed",
+    label: "Filed",
+    checkbox: true
+  },
+  { key: "dateFiled", label: "Date filed" },
+  {
+    key: "caseAssignmentToYgr",
+    label: "Case Assignment to YGR",
+    checkbox: true
+  },
+  {
+    key: "filedSummons",
+    label: "Filed Summons",
+    checkbox: true
+  },
+  {
+    key: "confirmationIssued",
+    label: "Confirmation Issued",
+    checkbox: true
+  },
+  {
+    key: "emailSummonsToDefendantGroup",
+    label: "Email Summons to Defendant Group",
+    checkbox: true
+  }
+];
+
+function SmaTable({ records, loading, error }) {
   return (
-    <section className="case-table-card sma-table-card" aria-labelledby="sma-heading">
-      <div className="case-table-heading">
-        <div className="case-table-title">
-          <span className="case-table-symbol">SM</span>
-          <div>
-            <h2 id="sma-heading">SMA</h2>
-            <p>Filed case records</p>
-          </div>
-        </div>
-        <span className="table-record-label">Awaiting records</span>
-      </div>
-      <div className="table-scroll">
-        <table className="case-table" aria-label="SMA filed cases">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Case number</th>
-              <th scope="col">Date filed</th>
-              <th scope="col">Filer</th>
-              <th scope="col">Email</th>
-              <th scope="col">Drop box uploaded</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="placeholder-row">
-              <td>--</td>
-              <td>--</td>
-              <td>--</td>
-              <td>--</td>
-              <td>--</td>
-              <td>--</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  )
+    <CaseTable
+      id="sma"
+      title="SMA"
+      description="Case records and filing checklist"
+      icon={ClipboardList}
+      columns={COLUMNS}
+      records={records}
+      loading={loading}
+      error={error}
+    />
+  );
 }
 
-export default SmaTable
+export default SmaTable;

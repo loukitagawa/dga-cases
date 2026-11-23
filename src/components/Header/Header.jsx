@@ -1,43 +1,101 @@
-import logo from '../../assets/logo.jpg'
-import './Header.css'
+﻿import {
+  BadgeCheck,
+  FileCheck,
+  FileText,
+  Files,
+  Mail,
+  UserRoundCheck
+} from "lucide-react";
 
-function Header() {
+import "./Header.css";
+
+const PFAS_METRIC = {
+  key: "pfasFiled",
+  label: "Filed Cases",
+  icon: Files
+};
+
+const SMA_METRICS = [
+  { key: "smaFiled", label: "Filed Cases", icon: FileText },
+  { key: "smaCaseAssignmentToYgr", label: "Case Assignment to YGR", icon: UserRoundCheck },
+  { key: "smaFiledSummons", label: "Filed Summons", icon: FileCheck },
+  { key: "smaConfirmationIssued", label: "Confirmation Issued", icon: BadgeCheck },
+  { key: "smaEmailSummons", label: "Email Summons to Defendant Group", icon: Mail }
+];
+
+const countFormatter = new Intl.NumberFormat("en-US");
+
+function StatCard({ metric, value, unavailable }) {
+  const Icon = metric.icon;
+  const count = value ?? 0;
+
+  return (
+    <div className="header-stat-card">
+      <span className="header-stat-icon" aria-hidden="true">
+        <Icon size={18} strokeWidth={1.8} />
+      </span>
+
+      <dl className="header-stat-details">
+        <dt className="header-stat-label">{metric.label}</dt>
+        <dd className="header-stat-value">
+          {unavailable ? (
+            <>
+              <span aria-hidden="true">{"\u2014"}</span>
+              <span className="header-stat-status">{unavailable}</span>
+            </>
+          ) : typeof count === "number" ? (
+            countFormatter.format(count)
+          ) : (
+            count
+          )}
+        </dd>
+      </dl>
+    </div>
+  );
+}
+
+function Header({ summary, loading, error }) {
+  const unavailable = loading ? "Loading" : error ? "Unavailable" : "";
+  const connectionState = loading ? "loading" : error ? "error" : "connected";
+
   return (
     <header className="app-header">
-      <div className="header-overview">
-        <div className="header-brand">
-          <img className="header-logo" src={logo} alt="David Grossman & Associates logo" />
-          <div>
-            <p className="header-name">David Grossman &amp; Associates</p>
-            <p className="header-caption">DGA case workspace</p>
-          </div>
+      <div className="header-intro">
+        <div>
+          <h1 tabIndex={-1}>PACER Tracker</h1>
+          <p>Monitor PFAS and SMA case filings, summons, and Dropbox uploads.</p>
         </div>
-        <section className="summary-panel" aria-label="PFAS filed cases summary">
-          <div className="summary-panel-heading">
-            <span className="summary-code">PFAS</span>
-            <span>Filed Cases</span>
-          </div>
-          <strong className="summary-value">--</strong>
+      </div>
+
+      <div className="header-stats" aria-busy={loading}>
+        <section
+          className="header-stat-group header-stat-group-pfas"
+          aria-labelledby="header-pfas-title"
+        >
+          <h2 className="header-stat-heading" id="header-pfas-title">PFAS</h2>
+          <StatCard
+            metric={PFAS_METRIC}
+            value={summary?.[PFAS_METRIC.key]}
+            unavailable={unavailable}
+          />
         </section>
-        <section className="summary-panel sma-summary" aria-label="SMA case summary">
-          <div className="summary-panel-heading">
-            <span className="summary-code">SMA</span>
-            <span>Case Summary</span>
-          </div>
-          <div className="summary-metrics">
-            <div>
-              <span>Filed Cases</span>
-              <strong>--</strong>
-            </div>
-            <div>
-              <span>Email Summons</span>
-              <strong>--</strong>
-            </div>
+
+        <section className="header-stat-group" aria-labelledby="header-sma-title">
+          <h2 className="header-stat-heading" id="header-sma-title">SMA Case Summary</h2>
+          <div className="header-stat-grid">
+            {SMA_METRICS.map((metric) => (
+              <StatCard
+                key={metric.key}
+                metric={metric}
+                value={summary?.[metric.key]}
+                unavailable={unavailable}
+              />
+            ))}
           </div>
         </section>
       </div>
     </header>
-  )
+  );
 }
 
-export default Header
+export default Header;
