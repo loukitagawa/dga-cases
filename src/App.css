@@ -14,15 +14,15 @@
   --ink: #eff3f9;
   --text: #c9d2df;
   --muted: #a1afc2;
-  --accent: #f58a2f;
-  --accent-soft: #392721;
-  --accent-line: #684338;
+  --accent: #fe6645;
+  --accent-mid: #ee4524;
+  --accent-deep: #bd3720;
+  --accent-soft: #39221e;
+  --accent-fill: linear-gradient(to bottom, var(--accent), var(--accent-mid) 45%, var(--accent-deep));
   --blue: #b1c8fb;
   --blue-soft: #222f47;
   --green: #80dcb0;
   --green-soft: #172e27;
-  --amber: #f7cd80;
-  --amber-soft: #352a17;
   --red: #ffaeaf;
   --red-soft: #382127;
   --page-gutter: clamp(0.75rem, 1.28vw, 1.25rem);
@@ -273,8 +273,8 @@ body {
 }
 
 .record-status.is-pending {
-  background: var(--amber-soft);
-  color: var(--amber);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .table-empty {

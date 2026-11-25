@@ -202,7 +202,7 @@
 }
 
 .campaign-status[data-status="Loading"]::before {
-  background: var(--amber);
+  background: var(--accent);
 }
 
 .campaign-status[data-status="Unavailable"]::before {
@@ -341,7 +341,7 @@
 .chart-bar {
   width: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 
 .chart-column > span {
@@ -388,8 +388,8 @@
 }
 
 .pfas-progress progress::-webkit-progress-bar { background: #2b2b2d; }
-.pfas-progress progress::-webkit-progress-value { border-radius: 99px; background: var(--accent); }
-.pfas-progress progress::-moz-progress-bar { border-radius: 99px; background: var(--accent); }
+.pfas-progress progress::-webkit-progress-value { border-radius: 99px; background: var(--accent-fill); }
+.pfas-progress progress::-moz-progress-bar { border-radius: 99px; background: var(--accent-fill); }
 
 .pfas-progress-note {
   color: var(--accent);
@@ -1680,6 +1680,1161 @@
 
   .activity-spinning {
     animation: none;
+  }
+
+}
+/* =========================================
+   PACER TRACKER
+   TV DISPLAY ANIMATION SYSTEM
+========================================= */
+
+.tv-dashboard {
+  --tv-green: #22c55e;
+  --tv-surface: #19191b;
+  --tv-border: #343438;
+
+  min-width: 0;
+}
+
+.tv-dashboard *,
+.tv-dashboard *::before,
+.tv-dashboard *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   ANIMATED NUMBER COUNTERS
+========================================= */
+
+.animated-number {
+  display: inline-block;
+
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================
+   HEADER BANNER
+========================================= */
+
+.tv-header-intro {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  isolation: isolate;
+  overflow: hidden;
+
+  animation: tvFadeIn 0.7s ease both;
+}
+
+.tv-header-copy {
+  position: relative;
+  z-index: 2;
+
+  min-width: 0;
+}
+
+.tv-header-copy h1 {
+  margin-bottom: 5px;
+}
+
+.tv-header-copy p {
+  margin-bottom: 10px;
+}
+
+/* =========================================
+   ANIMATED ORANGE BANNER LINE
+========================================= */
+
+.tv-banner-line {
+  position: absolute;
+
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  height: 2px;
+
+  background: rgba(239, 69, 36, 0.12);
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.tv-banner-line::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 35%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ef4524,
+    #ff785a,
+    transparent
+  );
+
+  animation: tvBannerSweep 6s linear infinite;
+}
+
+/* =========================================
+   LIVE STATUS
+========================================= */
+
+.tv-live-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: #c3c3c8;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.tv-live-dot {
+  display: inline-block;
+
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+
+  animation: tvStatusPulse 2s ease-in-out infinite;
+}
+
+.tv-live-status[data-status="Loading"]
+.tv-live-dot {
+  background: var(--accent);
+}
+
+.tv-live-status[data-status="Unavailable"]
+.tv-live-dot {
+  background: #ef4524;
+  animation: none;
+}
+
+/* =========================================
+   LIVE CLOCK
+========================================= */
+
+.tv-clock {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 12px 15px;
+
+  margin-left: auto;
+
+  background: rgba(15, 15, 17, 0.88);
+
+  border: 1px solid rgba(239, 69, 36, 0.3);
+  border-radius: 8px;
+
+  flex-shrink: 0;
+}
+
+.tv-clock > svg {
+  width: 23px;
+  height: 23px;
+
+  color: #ef4524;
+
+  flex-shrink: 0;
+}
+
+.tv-clock-content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.tv-clock-content strong {
+  color: #ffffff;
+
+  font-size: clamp(15px, 1.5vw, 26px);
+  font-weight: 700;
+
+  font-variant-numeric: tabular-nums;
+
+  white-space: nowrap;
+}
+
+.tv-clock-content span {
+  color: #a1a1aa;
+
+  font-size: clamp(9px, 0.7vw, 12px);
+
+  white-space: nowrap;
+}
+
+/* =========================================
+   CAMPAIGN CARD ANIMATIONS
+========================================= */
+
+.tv-animated-card {
+  position: relative;
+
+  overflow: hidden;
+
+  animation: tvSlideUp 0.7s ease both;
+}
+
+.campaign-grid .tv-animated-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.campaign-grid .tv-animated-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+/* Moving accent across card bottom */
+
+.tv-animated-card::after {
+  content: "";
+
+  position: absolute;
+
+  bottom: 0;
+  left: 0;
+
+  height: 2px;
+  width: 25%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(239, 69, 36, 0.85),
+    transparent
+  );
+
+  animation: tvCardSweep 8s linear infinite;
+
+  pointer-events: none;
+}
+
+.campaign-grid .tv-animated-card:nth-child(2)::after {
+  animation-delay: -4s;
+}
+
+/* =========================================
+   CAMPAIGN ICON ANIMATION
+========================================= */
+
+.tv-animated-card .campaign-icon {
+  animation: tvIconFloat 4s ease-in-out infinite;
+}
+
+.campaign-grid
+.tv-animated-card:nth-child(2)
+.campaign-icon {
+  animation-delay: -2s;
+}
+
+/* =========================================
+   MONITORING PANELS
+========================================= */
+
+.tv-monitoring-panel {
+  animation: tvSlideUp 0.8s ease both;
+
+  min-width: 0;
+}
+
+.monitoring-grid
+.tv-monitoring-panel:nth-child(1) {
+  animation-delay: 0.25s;
+}
+
+.monitoring-grid
+.tv-monitoring-panel:nth-child(2) {
+  animation-delay: 0.35s;
+}
+
+/* =========================================
+   PANEL STATUS INDICATOR
+========================================= */
+
+.tv-dashboard .campaign-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+.panel-status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+
+  flex-shrink: 0;
+}
+
+.campaign-status[data-status="Active"]
+.panel-status-dot {
+  background: #22c55e;
+
+  animation: tvStatusPulse 2s ease-in-out infinite;
+}
+
+/* =========================================
+   ANIMATED CHART BARS
+========================================= */
+
+.tv-filing-chart .chart-track {
+  position: relative;
+
+  overflow: hidden;
+}
+
+.tv-filing-chart .tv-chart-bar {
+  position: relative;
+
+  background: var(--accent-fill);
+
+  border-radius: 5px 5px 0 0;
+
+  transition:
+    height 1.4s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+
+  overflow: hidden;
+}
+
+/* Subtle moving highlight inside chart */
+
+.tv-chart-bar::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 30%;
+
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+
+  animation: tvBarScan 6s linear infinite;
+
+  pointer-events: none;
+}
+
+.chart-column:nth-child(2)
+.tv-chart-bar::after {
+  animation-delay: -1s;
+}
+
+.chart-column:nth-child(3)
+.tv-chart-bar::after {
+  animation-delay: -2s;
+}
+
+.chart-column:nth-child(4)
+.tv-chart-bar::after {
+  animation-delay: -3s;
+}
+
+.chart-column:nth-child(5)
+.tv-chart-bar::after {
+  animation-delay: -4s;
+}
+
+/* =========================================
+   ANIMATED PFAS PROGRESS BAR
+========================================= */
+
+.tv-progress-track {
+  position: relative;
+
+  width: 100%;
+  height: 12px;
+
+  margin: 9px 0;
+
+  background: #303033;
+
+  border-radius: 5px;
+
+  overflow: hidden;
+}
+
+.tv-progress-fill {
+  position: relative;
+
+  height: 100%;
+
+  background: linear-gradient(to right, var(--accent-deep), var(--accent-mid), var(--accent));
+
+  border-radius: 5px;
+
+  overflow: hidden;
+
+  transition:
+    width 1.6s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+}
+
+/* Moving highlight */
+
+.tv-progress-shine {
+  position: absolute;
+
+  inset: 0;
+
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 80%
+  );
+
+  animation: tvProgressShine 4s linear infinite;
+
+  pointer-events: none;
+}
+
+.tv-progress-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  flex-wrap: wrap;
+}
+
+.tv-progress-percent {
+  color: #ef4524;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+/* =========================================
+   RECENT TEAM ACTIVITY
+========================================= */
+
+.tv-recent-activity {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  animation: tvSlideUp 0.8s ease 0.45s both;
+}
+
+.tv-activity-heading-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  flex-shrink: 0;
+}
+
+.tv-activity-live {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: #22c55e;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.tv-activity-live .tv-live-dot {
+  width: 6px;
+  height: 6px;
+}
+
+/* =========================================
+   ACTIVITY LIST
+========================================= */
+
+.tv-activity-list {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  min-height: 0;
+  min-width: 0;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+
+  overflow-y: auto;
+}
+
+/* =========================================
+   ANIMATED ACTIVITY ROW
+========================================= */
+
+.tv-activity-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 9px 14px;
+
+  flex: 1;
+
+  min-width: 0;
+
+  border-bottom: 1px solid #303033;
+
+  animation: tvActivityEnter 0.55s ease both;
+}
+
+.tv-activity-item:last-child {
+  border-bottom: none;
+}
+
+/* =========================================
+   CHECKBOX ICON
+========================================= */
+
+.checkbox-activity-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  border-radius: 8px;
+
+  flex-shrink: 0;
+}
+
+.checkbox-activity-icon svg {
+  width: 21px;
+  height: 21px;
+
+  stroke-width: 1.8;
+}
+
+.checkbox-activity-icon.is-checked {
+  color: #22c55e;
+
+  background: rgba(34, 197, 94, 0.10);
+
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.checkbox-activity-icon.is-unchecked {
+  color: #ef4524;
+
+  background: rgba(239, 69, 36, 0.10);
+
+  border: 1px solid rgba(239, 69, 36, 0.25);
+}
+
+/* =========================================
+   ACTIVITY INFORMATION
+========================================= */
+
+.team-activity-content {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  min-width: 0;
+
+  gap: 4px;
+}
+
+.team-activity-title {
+  color: #ffffff;
+
+  font-size: clamp(12px, 1vw, 17px);
+  font-weight: 600;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-activity-field {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 0;
+
+  color: #c4c4cc;
+
+  font-size: clamp(10px, 0.85vw, 13px);
+}
+
+.activity-field-name {
+  min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-category {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 2px 7px;
+
+  border: 1px solid rgba(239, 69, 36, 0.25);
+  border-radius: 4px;
+
+  background: rgba(239, 69, 36, 0.10);
+
+  color: #ef4524;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+.team-activity-description {
+  color: #92929c;
+
+  font-size: 11px;
+}
+
+.activity-checked-text {
+  color: #22c55e;
+
+  font-weight: 600;
+}
+
+.activity-unchecked-text {
+  color: #ef4524;
+
+  font-weight: 600;
+}
+
+/* =========================================
+   ACTIVITY TIMESTAMP
+========================================= */
+
+.team-activity-date {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: #a1a1aa;
+
+  font-size: clamp(10px, 0.8vw, 12px);
+
+  white-space: nowrap;
+
+  flex-shrink: 0;
+}
+
+.team-activity-date svg {
+  width: 13px;
+  height: 13px;
+
+  color: #ef4524;
+}
+
+/* =========================================
+   AUTOMATIC ROTATION INDICATOR
+========================================= */
+
+.tv-activity-pagination {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 7px 14px;
+
+  border-top: 1px solid #303033;
+
+  color: #92929c;
+
+  font-size: 10px;
+
+  flex-shrink: 0;
+}
+
+.tv-activity-pagination > span {
+  white-space: nowrap;
+}
+
+.tv-pagination-track {
+  position: relative;
+
+  flex: 1;
+
+  height: 3px;
+
+  background: #303033;
+
+  border-radius: 3px;
+
+  overflow: hidden;
+}
+
+.tv-pagination-fill {
+  width: 100%;
+  height: 100%;
+
+  background: #ef4524;
+
+  border-radius: 3px;
+
+  transform-origin: left center;
+
+  animation-name: tvPaginationProgress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* =========================================
+   ACTIVITY FOOTER
+========================================= */
+
+.team-activity-footer {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px 14px;
+
+  border-top: 1px solid #303033;
+
+  color: #92929c;
+
+  font-size: 11px;
+
+  flex-shrink: 0;
+}
+
+.team-activity-footer svg {
+  width: 13px;
+  height: 13px;
+
+  color: #22c55e;
+
+  flex-shrink: 0;
+}
+
+.tv-auto-scroll-label {
+  margin-left: auto;
+
+  color: #ef4524;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* Refresh icon rotates periodically */
+
+.tv-refresh-icon {
+  animation: tvPeriodicSpin 8s ease-in-out infinite;
+}
+
+.activity-spinning {
+  animation: tvContinuousSpin 1s linear infinite;
+}
+
+/* =========================================
+   VIEW ALL LINK
+========================================= */
+
+.view-all-link {
+  color: #ef4524;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: #ff795a;
+}
+
+/* =========================================
+   ANIMATION KEYFRAMES
+========================================= */
+
+@keyframes tvFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tvSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tvActivityEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tvStatusPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes tvBannerSweep {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(300%);
+  }
+}
+
+@keyframes tvCardSweep {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes tvIconFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes tvBarScan {
+  from {
+    top: -30%;
+  }
+
+  to {
+    top: 100%;
+  }
+}
+
+@keyframes tvProgressShine {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes tvPaginationProgress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes tvContinuousSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes tvPeriodicSpin {
+  0%,
+  75% {
+    transform: rotate(0deg);
+  }
+
+  90%,
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   LARGE TV DISPLAY
+========================================= */
+
+@media (min-width: 1600px) {
+
+  .tv-clock-content strong {
+    font-size: 26px;
+  }
+
+  .tv-clock-content span {
+    font-size: 12px;
+  }
+
+  .tv-live-status {
+    font-size: 12px;
+  }
+
+  .tv-progress-track {
+    height: 15px;
+  }
+
+  .tv-progress-percent {
+    font-size: 13px;
+  }
+
+  .tv-activity-item {
+    padding: 10px 18px;
+  }
+
+  .checkbox-activity-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .team-activity-title {
+    font-size: 17px;
+  }
+
+  .team-activity-field {
+    font-size: 13px;
+  }
+
+  .team-activity-description {
+    font-size: 12px;
+  }
+
+  .team-activity-date {
+    font-size: 12px;
+  }
+
+}
+
+/* =========================================
+   COMPACT DISPLAY
+========================================= */
+
+@media (max-height: 800px) {
+
+  .tv-clock {
+    padding: 7px 10px;
+  }
+
+  .tv-clock-content strong {
+    font-size: 17px;
+  }
+
+  .tv-clock-content span {
+    font-size: 9px;
+  }
+
+  .tv-clock > svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tv-live-status {
+    font-size: 9px;
+  }
+
+  .tv-progress-track {
+    height: 9px;
+    margin: 5px 0;
+  }
+
+  .tv-activity-item {
+    padding: 5px 10px;
+    gap: 8px;
+  }
+
+  .checkbox-activity-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .checkbox-activity-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .team-activity-content {
+    gap: 2px;
+  }
+
+  .team-activity-title {
+    font-size: 12px;
+  }
+
+  .team-activity-field,
+  .team-activity-description {
+    font-size: 10px;
+  }
+
+  .activity-category {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+
+  .tv-activity-pagination,
+  .team-activity-footer {
+    padding: 5px 10px;
+  }
+
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .tv-header-intro {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .tv-clock {
+    margin-left: 0;
+  }
+
+  .tv-clock-content strong {
+    font-size: 16px;
+  }
+
+  .tv-activity-item {
+    flex-wrap: wrap;
+  }
+
+  .team-activity-content {
+    flex-basis: calc(100% - 55px);
+  }
+
+  .team-activity-date {
+    width: 100%;
+    padding-left: 42px;
+  }
+
+  .tv-auto-scroll-label {
+    display: none;
+  }
+
+}
+
+/* =========================================
+   REDUCED MOTION ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .tv-dashboard *,
+  .tv-dashboard *::before,
+  .tv-dashboard *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .tv-pagination-fill {
+    transform: scaleX(1);
   }
 
 }

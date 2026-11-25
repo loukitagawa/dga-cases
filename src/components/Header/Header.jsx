@@ -1,4 +1,8 @@
-﻿import { useState } from "react";
+﻿import {
+  useState,
+  useEffect,
+  useRef
+} from "react";
 
 import {
   BadgeCheck,
@@ -22,8 +26,9 @@ import "./Header.css";
 // CONFIGURATION
 // ==========================================
 
-const numberFormat =
-  new Intl.NumberFormat("en-US");
+const numberFormat = new Intl.NumberFormat("en-US");
+
+const ACTIVITY_ROTATION_INTERVAL = 5000;
 
 const SMA_STAGES = [
   ["Filed", "smaFiled"],
@@ -66,6 +71,207 @@ function countValue(value) {
 }
 
 // ==========================================
+// REDUCED MOTION PREFERENCE
+// ==========================================
+
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    const handleChange = event => {
+      setReduced(event.matches);
+    };
+
+    media.addEventListener("change", handleChange);
+
+    return () => {
+      media.removeEventListener(
+        "change",
+        handleChange
+      );
+    };
+  }, []);
+
+  return reduced;
+}
+
+// ==========================================
+// ANIMATED NUMBER COUNTER
+// ==========================================
+
+function AnimatedNumber({
+  value,
+  duration = 1200,
+  className = ""
+}) {
+  const target = countValue(value);
+
+  const [displayValue, setDisplayValue] =
+    useState(0);
+
+  const currentValue = useRef(0);
+
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (target === null) return;
+
+    if (reducedMotion) {
+      currentValue.current = target;
+      setDisplayValue(target);
+      return;
+    }
+
+    const startValue = currentValue.current;
+
+    if (startValue === target) {
+      setDisplayValue(target);
+      return;
+    }
+
+    let animationFrame;
+
+    const startTime = performance.now();
+
+    function animate(now) {
+      const elapsed = now - startTime;
+
+      const progress = Math.min(
+        elapsed / duration,
+        1
+      );
+
+      const easing =
+        1 - Math.pow(1 - progress, 3);
+
+      const nextValue = Math.round(
+        startValue +
+        (target - startValue) * easing
+      );
+
+      currentValue.current = nextValue;
+
+      setDisplayValue(nextValue);
+
+      if (progress < 1) {
+        animationFrame =
+          requestAnimationFrame(animate);
+      }
+    }
+
+    animationFrame =
+      requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [target, duration, reducedMotion]);
+
+  return (
+    <span
+      className={`animated-number ${className}`}
+      aria-label={
+        target === null
+          ? "Unavailable"
+          : formatValue(target)
+      }
+    >
+      {target === null
+        ? "—"
+        : formatValue(displayValue)}
+    </span>
+  );
+}
+
+// ==========================================
+// LIVE STATUS INDICATOR
+// ==========================================
+
+function LiveStatus({ status }) {
+  return (
+    <div
+      className="tv-live-status"
+      data-status={status}
+    >
+      <span className="tv-live-dot" />
+
+      <span>
+        {status === "Active"
+          ? "Live Monitoring"
+          : status === "Loading"
+          ? "Connecting"
+          : "Connection unavailable"}
+      </span>
+    </div>
+  );
+}
+
+// ==========================================
+// LIVE CLOCK
+// ==========================================
+
+function LiveClock() {
+  const [now, setNow] = useState(
+    () => new Date()
+  );
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const time = now.toLocaleTimeString(
+    "en-US",
+    {
+      timeZone: "America/New_York",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
+    }
+  );
+
+  const date = now.toLocaleDateString(
+    "en-US",
+    {
+      timeZone: "America/New_York",
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    }
+  );
+
+  return (
+    <div className="tv-clock">
+
+      <Clock3 aria-hidden="true" />
+
+      <div className="tv-clock-content">
+
+        <strong>{time}</strong>
+
+        <span>{date} · ET</span>
+
+      </div>
+
+    </div>
+  );
+}
+
+// ==========================================
 // CAMPAIGN CARD
 // ==========================================
 
@@ -76,20 +282,28 @@ function CampaignCard({
   icon: Icon
 }) {
   return (
-    <article className="pacer-card campaign-card">
+    <article className="pacer-card campaign-card tv-animated-card">
 
       <span className="campaign-icon">
         <Icon aria-hidden="true" />
       </span>
 
       <div className="campaign-name">
+
         <h2>{title}</h2>
+
         <p>{description}</p>
+
       </div>
 
       <div className="campaign-count">
-        <strong>{formatValue(value)}</strong>
+
+        <strong>
+          <AnimatedNumber value={value} />
+        </strong>
+
         <span>filed cases</span>
+
       </div>
 
     </article>
@@ -119,7 +333,11 @@ function PanelHeading({
           className="campaign-status"
           data-status={status}
         >
+
+          <span className="panel-status-dot" />
+
           {status}
+
         </span>
       )}
 
@@ -155,14 +373,16 @@ function MetricRow({
         {label}
       </dt>
 
-      <dd>{formatValue(value)}</dd>
+      <dd>
+        <AnimatedNumber value={value} />
+      </dd>
 
     </div>
   );
 }
 
 // ==========================================
-// SMA FILING CHART
+// ANIMATED SMA FILING CHART
 // ==========================================
 
 function FilingChart({ summary }) {
@@ -189,8 +409,19 @@ function FilingChart({ summary }) {
       ceiling - index * step
   );
 
+  const [chartReady, setChartReady] =
+    useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setChartReady(true);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <figure className="filing-chart">
+    <figure className="filing-chart tv-filing-chart">
 
       <figcaption>
 
@@ -228,6 +459,10 @@ function FilingChart({ summary }) {
                   )
                 : null;
 
+            const barHeight = chartReady
+              ? (value ?? 0) / ceiling * 100
+              : 0;
+
             return (
               <li
                 key={label}
@@ -235,7 +470,7 @@ function FilingChart({ summary }) {
               >
 
                 <strong>
-                  {formatValue(value)}
+                  <AnimatedNumber value={value} />
                 </strong>
 
                 <div
@@ -243,24 +478,32 @@ function FilingChart({ summary }) {
                   aria-hidden="true"
                   data-empty={!value}
                 >
+
                   <div
-                    className="chart-bar"
+                    className="chart-bar tv-chart-bar"
                     style={{
-                      height: `${
-                        (value ?? 0) /
-                        ceiling *
-                        100
-                      }%`
+                      height: `${barHeight}%`,
+                      transitionDelay: `${index * 80}ms`
                     }}
                   />
+
                 </div>
 
                 <span>{label}</span>
 
                 <small>
+
                   {percent === null
                     ? "—"
-                    : `${percent}%`}
+                    : (
+                      <>
+                        <AnimatedNumber
+                          value={percent}
+                        />
+                        %
+                      </>
+                    )}
+
                 </small>
 
               </li>
@@ -281,7 +524,7 @@ function FilingChart({ summary }) {
 
 function SmaPanel({ summary, status }) {
   return (
-    <section className="pacer-card monitoring-panel">
+    <section className="pacer-card monitoring-panel tv-monitoring-panel">
 
       <PanelHeading
         title="Social Media Addiction"
@@ -293,26 +536,33 @@ function SmaPanel({ summary, status }) {
 
         <div>
           <dt>Filed cases</dt>
+
           <dd>
-            {formatValue(summary.smaFiled)}
+            <AnimatedNumber
+              value={summary.smaFiled}
+            />
           </dd>
         </div>
 
         <div>
           <dt>Assigned to YGR</dt>
+
           <dd>
-            {formatValue(
-              summary.smaCaseAssignmentToYgr
-            )}
+            <AnimatedNumber
+              value={
+                summary.smaCaseAssignmentToYgr
+              }
+            />
           </dd>
         </div>
 
         <div>
           <dt>Summons filed</dt>
+
           <dd>
-            {formatValue(
-              summary.smaFiledSummons
-            )}
+            <AnimatedNumber
+              value={summary.smaFiledSummons}
+            />
           </dd>
         </div>
 
@@ -342,6 +592,64 @@ function SmaPanel({ summary, status }) {
 }
 
 // ==========================================
+// ANIMATED PROGRESS BAR
+// ==========================================
+
+function AnimatedProgress({
+  value,
+  total
+}) {
+  const [ready, setReady] =
+    useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setReady(true);
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const percent =
+    value !== null &&
+    total !== null &&
+    total > 0
+      ? Math.min(
+          100,
+          Math.max(0, value / total * 100)
+        )
+      : 0;
+
+  return (
+    <div
+      className="tv-progress-track"
+      role="progressbar"
+      aria-label="PFAS cases filed"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={
+        value !== null && total !== null
+          ? Math.round(percent)
+          : undefined
+      }
+    >
+
+      <div
+        className="tv-progress-fill"
+        style={{
+          width: `${ready ? percent : 0}%`
+        }}
+      >
+
+        <span className="tv-progress-shine" />
+
+      </div>
+
+    </div>
+  );
+}
+
+// ==========================================
 // PFAS PANEL
 // ==========================================
 
@@ -362,8 +670,13 @@ function PfasPanel({ summary, status }) {
     ? Math.max(0, total - filed)
     : null;
 
+  const percent =
+    hasProgress && total > 0
+      ? Math.round(filed / total * 100)
+      : null;
+
   return (
-    <section className="pacer-card monitoring-panel">
+    <section className="pacer-card monitoring-panel tv-monitoring-panel">
 
       <PanelHeading
         title="Water Complaints"
@@ -376,7 +689,9 @@ function PfasPanel({ summary, status }) {
         <div className="pfas-feature-count">
 
           <strong>
-            {formatValue(summary.pfasFiled)}
+            <AnimatedNumber
+              value={summary.pfasFiled}
+            />
           </strong>
 
           <span>Filed cases</span>
@@ -392,30 +707,47 @@ function PfasPanel({ summary, status }) {
             </span>
 
             <strong>
-              {formatValue(filed)}
+              <AnimatedNumber value={filed} />
               {" / "}
-              {formatValue(total)}
+              <AnimatedNumber value={total} />
             </strong>
 
           </div>
 
-          <progress
-            aria-label="PFAS cases filed"
-            max={Math.max(1, total ?? 0)}
-            value={hasProgress ? filed : 0}
+          <AnimatedProgress
+            value={filed}
+            total={total}
           />
 
-          {remaining !== null && (
-            <span className="pfas-progress-note">
+          <div className="tv-progress-details">
 
-              {remaining === 1
-                ? "1 record"
-                : `${formatValue(remaining)} records`}
+            {remaining !== null && (
+              <span className="pfas-progress-note">
 
-              {" "}not yet filed
+                <AnimatedNumber
+                  value={remaining}
+                />
 
-            </span>
-          )}
+                {remaining === 1
+                  ? " record not yet filed"
+                  : " records not yet filed"}
+
+              </span>
+            )}
+
+            {percent !== null && (
+              <strong className="tv-progress-percent">
+
+                <AnimatedNumber
+                  value={percent}
+                />
+
+                % completed
+
+              </strong>
+            )}
+
+          </div>
 
         </div>
 
@@ -452,7 +784,98 @@ function PfasPanel({ summary, status }) {
 }
 
 // ==========================================
-// RECENT TEAM ACTIVITY
+// INDIVIDUAL ACTIVITY ITEM
+// ==========================================
+
+function ActivityItem({
+  activity,
+  index
+}) {
+  const checked =
+    activity.action === "Checked";
+
+  return (
+    <li
+      className="team-activity-item tv-activity-item"
+      style={{
+        animationDelay: `${index * 70}ms`
+      }}
+    >
+
+      <div
+        className={`checkbox-activity-icon ${
+          checked
+            ? "is-checked"
+            : "is-unchecked"
+        }`}
+      >
+
+        {checked ? (
+          <SquareCheck aria-hidden="true" />
+        ) : (
+          <Square aria-hidden="true" />
+        )}
+
+      </div>
+
+      <div className="team-activity-content">
+
+        <strong
+          className="team-activity-title"
+          title={activity.recordName}
+        >
+          {activity.recordName ||
+            "Unnamed record"}
+        </strong>
+
+        <span className="team-activity-field">
+
+          <span className="activity-category">
+            {activity.sheet}
+          </span>
+
+          <span
+            className="activity-field-name"
+            title={activity.field}
+          >
+            {activity.field}
+          </span>
+
+        </span>
+
+        <span className="team-activity-description">
+
+          <span
+            className={
+              checked
+                ? "activity-checked-text"
+                : "activity-unchecked-text"
+            }
+          >
+            {activity.action}
+          </span>
+
+          {" · Cell "}
+          {activity.cell}
+
+        </span>
+
+      </div>
+
+      <div className="team-activity-date">
+
+        <Clock3 aria-hidden="true" />
+
+        <span>{activity.date}</span>
+
+      </div>
+
+    </li>
+  );
+}
+
+// ==========================================
+// AUTOMATIC ACTIVITY ROTATION
 // ==========================================
 
 export function RecentActivity({
@@ -466,6 +889,11 @@ export function RecentActivity({
 
   const [firstRecord, setFirstRecord] =
     useState(0);
+
+  const [paused, setPaused] =
+    useState(false);
+
+  const reducedMotion = useReducedMotion();
 
   const records = Array.isArray(activities)
     ? activities
@@ -491,8 +919,84 @@ export function RecentActivity({
     (page + 1) * limit
   );
 
+  const latestActivityId =
+    records[0]?.id ?? null;
+
+  const previousLatestId = useRef(null);
+
+  // Return to newest activities when
+  // a new checkbox update is detected.
+
+  useEffect(() => {
+    if (
+      latestActivityId !==
+      previousLatestId.current
+    ) {
+      previousLatestId.current =
+        latestActivityId;
+
+      setFirstRecord(0);
+    }
+  }, [latestActivityId]);
+
+  // Automatically rotate activity pages
+  // on the TV dashboard.
+
+  useEffect(() => {
+    if (
+      pageSize ||
+      paused ||
+      reducedMotion ||
+      loading ||
+      error ||
+      pageCount <= 1
+    ) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setFirstRecord(previous => {
+        const currentPage = Math.min(
+          Math.floor(previous / limit),
+          pageCount - 1
+        );
+
+        const nextPage =
+          (currentPage + 1) % pageCount;
+
+        return nextPage * limit;
+      });
+    }, ACTIVITY_ROTATION_INTERVAL);
+
+    return () => clearInterval(timer);
+
+  }, [
+    pageSize,
+    paused,
+    reducedMotion,
+    loading,
+    error,
+    pageCount,
+    limit,
+    latestActivityId
+  ]);
+
   return (
-    <section className="pacer-card recent-activity">
+    <section
+      className="pacer-card recent-activity tv-recent-activity"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={event => {
+        if (
+          !event.currentTarget.contains(
+            event.relatedTarget
+          )
+        ) {
+          setPaused(false);
+        }
+      }}
+    >
 
       <PanelHeading
         title={
@@ -504,113 +1008,42 @@ export function RecentActivity({
       >
 
         {!pageSize && (
-          <a
-            className="view-all-link"
-            href="#activity"
-          >
-            View all
-          </a>
+          <div className="tv-activity-heading-actions">
+
+            <span className="tv-activity-live">
+
+              <span className="tv-live-dot" />
+
+              Live
+
+            </span>
+
+            <a
+              className="view-all-link"
+              href="#activity"
+            >
+              View all
+            </a>
+
+          </div>
         )}
 
       </PanelHeading>
 
       {shownRecords.length > 0 ? (
 
-        <ul className="team-activity-list">
+        <ul
+          className="team-activity-list tv-activity-list"
+          key={`${page}-${latestActivityId}`}
+        >
 
-          {shownRecords.map((activity, index) => {
-            const checked =
-              activity.action === "Checked";
-
-            return (
-              <li
-                key={activity.id ?? index}
-                className="team-activity-item"
-              >
-
-                {/* CHECKBOX ICON */}
-
-                <div
-                  className={`checkbox-activity-icon ${
-                    checked
-                      ? "is-checked"
-                      : "is-unchecked"
-                  }`}
-                >
-
-                  {checked ? (
-                    <SquareCheck aria-hidden="true" />
-                  ) : (
-                    <Square aria-hidden="true" />
-                  )}
-
-                </div>
-
-                {/* ACTIVITY INFORMATION */}
-
-                <div className="team-activity-content">
-
-                  {/* RECORD NAME */}
-
-                  <strong
-                    className="team-activity-title"
-                    title={activity.recordName}
-                  >
-                    {activity.recordName ||
-                      "Unnamed record"}
-                  </strong>
-
-                  {/* CATEGORY AND CHECKBOX FIELD */}
-
-                  <span className="team-activity-field">
-
-                    <span className="activity-category">
-                      {activity.sheet}
-                    </span>
-
-                    <span
-                      className="activity-field-name"
-                      title={activity.field}
-                    >
-                      {activity.field}
-                    </span>
-
-                  </span>
-
-                  {/* CHECKBOX STATUS */}
-
-                  <span className="team-activity-description">
-
-                    <span
-                      className={
-                        checked
-                          ? "activity-checked-text"
-                          : "activity-unchecked-text"
-                      }
-                    >
-                      {activity.action}
-                    </span>
-
-                    {" · Cell "}
-                    {activity.cell}
-
-                  </span>
-
-                </div>
-
-                {/* ACTIVITY TIMESTAMP */}
-
-                <div className="team-activity-date">
-
-                  <Clock3 aria-hidden="true" />
-
-                  <span>{activity.date}</span>
-
-                </div>
-
-              </li>
-            );
-          })}
+          {shownRecords.map((activity, index) => (
+            <ActivityItem
+              key={activity.id ?? index}
+              activity={activity}
+              index={index}
+            />
+          ))}
 
         </ul>
 
@@ -644,7 +1077,7 @@ export function RecentActivity({
 
       )}
 
-      {/* PAGINATION */}
+      {/* MANUAL PAGINATION FOR ACTIVITY PAGE */}
 
       {pageSize && pageCount > 1 && (
 
@@ -685,14 +1118,58 @@ export function RecentActivity({
 
       )}
 
-      {/* REFRESH STATUS */}
+      {/* AUTOMATIC ROTATION INDICATOR */}
+
+      {!pageSize && pageCount > 1 && (
+
+        <div className="tv-activity-pagination">
+
+          <span>
+            Showing {page * limit + 1}–
+            {Math.min(
+              (page + 1) * limit,
+              records.length
+            )} of {records.length}
+          </span>
+
+          <div className="tv-pagination-track">
+
+            <div
+              className="tv-pagination-fill"
+              key={`${page}-${latestActivityId}`}
+              style={{
+                animationDuration:
+                  `${ACTIVITY_ROTATION_INTERVAL}ms`,
+                animationPlayState:
+                  paused || reducedMotion ||
+                  loading || error
+                    ? "paused"
+                    : "running"
+              }}
+            />
+
+          </div>
+
+          <span>
+            {page + 1} / {pageCount}
+          </span>
+
+        </div>
+
+      )}
+
+      {/* CONNECTION STATUS */}
 
       <div className="team-activity-footer">
 
         <RefreshCw
           aria-hidden="true"
           className={
-            loading ? "activity-spinning" : ""
+            loading
+              ? "activity-spinning"
+              : !error
+              ? "tv-refresh-icon"
+              : ""
           }
         />
 
@@ -705,6 +1182,18 @@ export function RecentActivity({
             : "Automatic refresh every 15 seconds"}
 
         </span>
+
+        {!pageSize && (
+          <span className="tv-auto-scroll-label">
+
+            {paused || reducedMotion
+              ? "Rotation paused"
+              : pageCount > 1
+              ? "Auto rotation"
+              : "Latest activity"}
+
+          </span>
+        )}
 
       </div>
 
@@ -734,25 +1223,37 @@ export default function Header({
 
   return (
     <div
-      className="pacer-home"
+      className="pacer-home tv-dashboard"
       aria-busy={loading}
     >
 
-      {/* HEADER BANNER */}
+      {/* ANIMATED HEADER BANNER */}
 
-      <header className="pacer-card header-intro">
+      <header className="pacer-card header-intro tv-header-intro">
 
-        <h1 tabIndex={-1}>
-          PACER <span>Tracker</span>
-        </h1>
+        <div className="tv-header-copy">
 
-        <p>
-          Case Filing and Document Monitoring
-        </p>
+          <h1 tabIndex={-1}>
+            PACER <span>Tracker</span>
+          </h1>
+
+          <p>
+            Case Filing and Document Monitoring
+          </p>
+
+          <LiveStatus status={status} />
+
+        </div>
+ 
+
+        <div
+          className="tv-banner-line"
+          aria-hidden="true"
+        />
 
       </header>
 
-      {/* CAMPAIGN CARDS */}
+      {/* ANIMATED CAMPAIGN CARDS */}
 
       <div className="campaign-grid">
 
@@ -772,7 +1273,7 @@ export default function Header({
 
       </div>
 
-      {/* MONITORING PANELS */}
+      {/* ANIMATED MONITORING PANELS */}
 
       <div className="monitoring-grid">
 
@@ -787,6 +1288,8 @@ export default function Header({
         />
 
       </div>
+
+      {/* AUTOMATIC ACTIVITY ROTATION */}
 
       <RecentActivity />
 
