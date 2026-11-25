@@ -39,7 +39,12 @@ function App() {
       <Sidebar page={page} />
       <main className="dashboard" ref={mainRef} aria-label={title}>
         {page === "home" && (
-          <Header summary={data.summary} loading={loading} error={error} />
+          <Header
+            summary={data.summary}
+            lastUpdated={data.lastUpdated}
+            loading={loading}
+            error={error}
+          />
         )}
         {error && (
           <div className="api-error" role="alert">

@@ -54,10 +54,12 @@ body {
 }
 
 .dashboard {
+  --dashboard-top: 36px;
+
   container-type: inline-size;
   width: min(var(--page-width), 100%);
   margin-inline: auto;
-  padding: 36px var(--page-gutter) 48px;
+  padding: var(--dashboard-top) var(--page-gutter) 48px;
 }
 
 .dashboard h1[tabindex="-1"]:focus {
@@ -341,7 +343,7 @@ body {
   }
 
   .dashboard {
-    padding-top: 22px;
+    --dashboard-top: 22px;
   }
 
   .case-table-heading {

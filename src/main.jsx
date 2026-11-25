@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "@fontsource-variable/inter/standard.css";
 import App from "./App.jsx";
+import "./services/firebase.js";
 
 ReactDOM.createRoot(
   document.getElementById("root")
