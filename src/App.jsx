@@ -30,7 +30,17 @@ function App() {
     const frame = viewportRef.current;
     const content = contentRef.current;
     const { clientWidth: width, clientHeight: height } = frame;
-    const scale = Math.min(1, width / Math.max(1, content.scrollWidth), height / Math.max(1, content.scrollHeight));
+    content.style.removeProperty("--page-fit-width");
+    content.style.removeProperty("--page-fit-height");
+
+    const naturalWidth = content.scrollWidth;
+    const scale = Math.min(1, width / Math.max(1, naturalWidth), height / Math.max(1, content.scrollHeight));
+    // Make room horizontally before scaling a home dashboard that's too tall.
+    const canWiden = frame.parentElement.dataset.page === "home" && naturalWidth <= width;
+    if (canWiden && scale > 0 && scale < 1) {
+      content.style.setProperty("--page-fit-width", `${width / scale}px`);
+      content.style.setProperty("--page-fit-height", `${height / scale}px`);
+    }
     content.style.setProperty("--page-scale", scale);
     setViewport((previous) => previous.width === width && previous.height === height ? previous : { width, height });
   }, []);
@@ -60,7 +70,7 @@ function App() {
         <div className="dashboard-viewport" ref={viewportRef}>
           <div className="dashboard-page" ref={contentRef}>
             {page === "home" && (
-              <Header summary={data.summary} activities={data.activities} links={data.links} loading={loading} error={error} />
+              <Header summary={data.summary} activities={data.activities} loading={loading} error={error} />
             )}
             {error && <div className="api-error" role="alert">{error}</div>}
             {page === "pfas" && <PfasTable records={data.pfas} loading={loading} error={error} viewport={viewport} />}

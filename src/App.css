@@ -86,8 +86,10 @@ body {
 
 .dashboard[data-page="home"] .dashboard-page {
   display: flex;
-  min-height: 100%;
+  width: var(--page-fit-width, auto);
+  min-height: var(--page-fit-height, 100%);
   flex-direction: column;
+  transform-origin: top left;
 }
 
 @media (min-width: 701px) {

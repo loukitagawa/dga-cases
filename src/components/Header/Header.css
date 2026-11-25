@@ -1,4 +1,4 @@
-.pacer-home,
+﻿.pacer-home,
 .activity-page {
   --unit: clamp(1px, 0.125cqi, 1.6px);
   --card-border: #29292b;
@@ -88,15 +88,10 @@
 }
 
 .campaign-grid,
-.monitoring-grid,
-.bottom-grid {
+.monitoring-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: calc(8 * var(--unit));
-}
-
-.bottom-grid {
-  grid-template-columns: minmax(0, 1.78fr) minmax(0, 1fr);
 }
 
 .campaign-card {
@@ -131,7 +126,6 @@
 .filing-chart figcaption > span,
 .chart-axis,
 .chart-column small,
-.quick-link-list small,
 .activity-empty p {
   color: var(--muted);
   font-size: max(0.5625rem, 0.82em);
@@ -184,8 +178,7 @@
 .pacer-panel-heading svg,
 .pfas-metrics h3 svg,
 .filing-chart h3 svg,
-.metric-row svg,
-.quick-link-list svg {
+.metric-row svg {
   flex: none;
   width: calc(10 * var(--unit));
   height: auto;
@@ -420,8 +413,7 @@
   border-bottom: 0;
 }
 
-.recent-activity,
-.quick-links {
+.pacer-home .recent-activity {
   display: flex;
   min-height: calc(119 * var(--unit));
   flex-direction: column;
@@ -480,41 +472,12 @@
   white-space: nowrap;
 }
 
-.quick-link-list {
-  display: grid;
-  gap: calc(4 * var(--unit));
-  padding: calc(6 * var(--unit));
-}
-
-.quick-link-list > * {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: calc(6 * var(--unit));
-  min-height: calc(23 * var(--unit));
-  padding: calc(3 * var(--unit)) calc(7 * var(--unit));
-  border: 1px solid #2c2c2e;
-  border-radius: calc(4 * var(--unit));
-  background: #101012;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.quick-link-list a:hover {
-  border-color: var(--accent);
-}
-
-.quick-link-list svg {
-  color: var(--muted);
-}
-
 .activity-page h1 {
   margin-bottom: 0.75em;
 }
 
 @container (max-width: 640px) {
-  .monitoring-grid,
-  .bottom-grid {
+  .monitoring-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -524,7 +487,7 @@
     font-size: 0.8125rem;
   }
 
-  .recent-activity {
+  .pacer-home .recent-activity {
     min-height: 9rem;
   }
 
@@ -534,13 +497,1189 @@
     opacity: 0.8;
   }
 
-  .quick-link-list > * {
-    min-height: 2.4rem;
-  }
 }
 
 @container (max-width: 380px) {
   .campaign-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+/* =========================================
+   RECENT TEAM ACTIVITY
+========================================= */
+
+.recent-activity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ACTIVITY LIST */
+
+.team-activity-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  list-style: none;
+
+  padding: 0;
+  margin: 0;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* ACTIVITY ITEM */
+
+.team-activity-item {
+  display: flex;
+  align-items: center;
+
+  flex: 1;
+
+  gap: 12px;
+  padding: 8px 14px;
+
+  min-width: 0;
+
+  border-bottom: 1px solid #2b2b2e;
+
+  transition: background-color 0.2s ease;
+}
+
+.team-activity-item:hover {
+  background-color: #202022;
+}
+
+.team-activity-item:last-child {
+  border-bottom: none;
+}
+
+/* USER AVATAR */
+
+.team-activity-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  background-color: rgba(239, 69, 36, 0.12);
+  border: 1px solid rgba(239, 69, 36, 0.25);
+
+  color: #ef4524;
+
+  border-radius: 8px;
+}
+
+.team-activity-avatar svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.8;
+}
+
+/* ACTIVITY CONTENT */
+
+.team-activity-content {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  flex: 1;
+  gap: 4px;
+
+  min-width: 0;
+}
+
+.team-activity-user {
+  color: #f5f5f5;
+
+  font-size: clamp(11px, 0.85vw, 15px);
+  font-weight: 600;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-activity-description {
+  color: #b5b5bd;
+
+  font-size: clamp(10px, 0.8vw, 13px);
+  font-weight: 400;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ACTIVITY TIMESTAMP */
+
+.team-activity-date {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  flex-shrink: 0;
+
+  color: #9999a3;
+
+  font-size: clamp(9px, 0.7vw, 12px);
+
+  white-space: nowrap;
+}
+
+.team-activity-date svg {
+  width: 12px;
+  height: 12px;
+  color: #ef4524;
+}
+
+/* AUTOMATIC REFRESH FOOTER */
+
+.team-activity-footer {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 8px 14px;
+
+  border-top: 1px solid #2b2b2e;
+
+  color: #8c8c96;
+
+  font-size: 10px;
+
+  flex-shrink: 0;
+}
+
+.team-activity-footer svg {
+  width: 12px;
+  height: 12px;
+
+  color: #22c55e;
+}
+
+/* EMPTY STATE */
+
+.recent-activity .activity-empty {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 1;
+  gap: 6px;
+
+  padding: 12px;
+
+  text-align: center;
+}
+
+.recent-activity .activity-empty > svg {
+  width: 24px;
+  height: 24px;
+
+  color: #ef4524;
+}
+
+.recent-activity .activity-empty strong {
+  font-size: 13px;
+  color: #e5e5e5;
+}
+
+.recent-activity .activity-empty p {
+  margin: 0;
+
+  font-size: 11px;
+  color: #92929c;
+}
+
+/* VIEW ALL */
+
+.view-all-link {
+  color: #ef4524;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: #ff6947;
+}
+
+/* SMALLER SCREENS */
+
+@media (max-width: 1200px) {
+  .team-activity-item {
+    gap: 8px;
+    padding: 6px 10px;
+  }
+
+  .team-activity-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .team-activity-avatar svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .team-activity-date {
+    font-size: 9px;
+  }
+}
+
+@media (max-height: 800px) {
+  .team-activity-item {
+    padding: 5px 10px;
+  }
+
+  .team-activity-footer {
+    padding: 5px 10px;
+  }
+
+  .team-activity-avatar {
+    width: 28px;
+    height: 28px;
+  }
+}
+/* =========================================
+   RECENT TEAM ACTIVITY
+========================================= */
+
+.recent-activity {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   ACTIVITY LIST
+========================================= */
+
+.team-activity-list {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  list-style: none;
+
+  padding: 0;
+  margin: 0;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: #ef4524 transparent;
+}
+
+/* =========================================
+   ACTIVITY ITEM
+========================================= */
+
+.team-activity-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 10px 14px;
+
+  flex: 1;
+  min-width: 0;
+
+  border-bottom: 1px solid #303033;
+
+  transition: background-color 0.2s ease;
+}
+
+.team-activity-item:last-child {
+  border-bottom: none;
+}
+
+.team-activity-item:hover {
+  background-color: #202023;
+}
+
+/* =========================================
+   CHECKBOX ICON
+========================================= */
+
+.checkbox-activity-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+}
+
+.checkbox-activity-icon svg {
+  width: 21px;
+  height: 21px;
+
+  stroke-width: 1.8;
+}
+
+.checkbox-activity-icon.is-checked {
+  color: #22c55e;
+
+  background-color: rgba(34, 197, 94, 0.10);
+
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.checkbox-activity-icon.is-unchecked {
+  color: #ef4524;
+
+  background-color: rgba(239, 69, 36, 0.10);
+
+  border: 1px solid rgba(239, 69, 36, 0.25);
+}
+
+/* =========================================
+   ACTIVITY CONTENT
+========================================= */
+
+.team-activity-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  flex: 1;
+
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.team-activity-title {
+  color: #f5f5f5;
+
+  font-size: clamp(11px, 0.9vw, 15px);
+  font-weight: 600;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-activity-description {
+  color: #a1a1aa;
+
+  font-size: clamp(10px, 0.8vw, 13px);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-checked-text {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.activity-unchecked-text {
+  color: #ef4524;
+  font-weight: 500;
+}
+
+/* =========================================
+   ACTIVITY DATE
+========================================= */
+
+.team-activity-date {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  color: #a1a1aa;
+
+  font-size: clamp(9px, 0.75vw, 12px);
+
+  white-space: nowrap;
+}
+
+.team-activity-date svg {
+  width: 13px;
+  height: 13px;
+
+  color: #ef4524;
+}
+
+/* =========================================
+   ACTIVITY FOOTER
+========================================= */
+
+.team-activity-footer {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 8px 14px;
+
+  border-top: 1px solid #303033;
+
+  color: #92929c;
+
+  font-size: 11px;
+
+  flex-shrink: 0;
+}
+
+.team-activity-footer svg {
+  width: 13px;
+  height: 13px;
+
+  color: #22c55e;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.recent-activity .activity-empty {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 1;
+
+  gap: 8px;
+
+  padding: 15px;
+
+  text-align: center;
+}
+
+.recent-activity .activity-empty > svg {
+  width: 26px;
+  height: 26px;
+
+  color: #ef4524;
+}
+
+.recent-activity .activity-empty strong {
+  color: #f5f5f5;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recent-activity .activity-empty p {
+  margin: 0;
+
+  color: #92929c;
+
+  font-size: 12px;
+}
+
+/* =========================================
+   VIEW ALL LINK
+========================================= */
+
+.view-all-link {
+  color: #ef4524;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: #ff6947;
+}
+
+/* =========================================
+   REFRESH ANIMATION
+========================================= */
+
+.activity-spinning {
+  animation: activitySpin 1s linear infinite;
+}
+
+@keyframes activitySpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1200px) {
+
+  .team-activity-item {
+    gap: 8px;
+    padding: 7px 10px;
+  }
+
+  .checkbox-activity-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .checkbox-activity-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .team-activity-date {
+    font-size: 9px;
+  }
+
+}
+
+@media (max-height: 800px) {
+
+  .team-activity-item {
+    padding: 5px 10px;
+  }
+
+  .checkbox-activity-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .checkbox-activity-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .team-activity-footer {
+    padding: 5px 10px;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .team-activity-item {
+    flex-wrap: wrap;
+  }
+
+  .team-activity-date {
+    padding-left: 40px;
+    width: 100%;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .activity-spinning {
+    animation: none;
+  }
+
+}
+
+@container (width > 640px) {
+  .pacer-home .recent-activity .pacer-panel-heading {
+    min-height: calc(25 * var(--unit));
+  }
+
+  .pacer-home .team-activity-list {
+    overflow: visible;
+  }
+
+  .pacer-home .team-activity-item {
+    gap: calc(7 * var(--unit));
+    padding: calc(2.5 * var(--unit)) var(--card-padding);
+  }
+
+  .pacer-home .checkbox-activity-icon {
+    width: calc(23 * var(--unit));
+    height: calc(23 * var(--unit));
+  }
+
+  .pacer-home .checkbox-activity-icon svg,
+  .pacer-home .team-activity-date svg,
+  .pacer-home .team-activity-footer svg {
+    width: calc(10 * var(--unit));
+    height: calc(10 * var(--unit));
+  }
+
+  .pacer-home .team-activity-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: calc(1 * var(--unit)) calc(7 * var(--unit));
+  }
+
+  .pacer-home .team-activity-title {
+    grid-column: 1 / -1;
+    font-size: calc(10 * var(--unit));
+    line-height: 1.2;
+  }
+
+  .pacer-home :is(.team-activity-field, .team-activity-description, .team-activity-date, .team-activity-footer) {
+    font-size: calc(8 * var(--unit));
+    line-height: 1.2;
+  }
+
+  .pacer-home .activity-category {
+    padding: 0 calc(3 * var(--unit));
+    font-size: calc(7 * var(--unit));
+  }
+
+  .pacer-home .team-activity-footer {
+    padding: calc(2.5 * var(--unit)) var(--card-padding);
+  }
+}
+/* =========================================
+   RECENT TEAM ACTIVITY
+========================================= */
+
+.recent-activity {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   ACTIVITY LIST
+========================================= */
+
+.team-activity-list {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  list-style: none;
+
+  margin: 0;
+  padding: 0;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: #ef4524 transparent;
+}
+
+/* =========================================
+   ACTIVITY ITEM
+========================================= */
+
+.team-activity-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 10px 14px;
+
+  flex: 1;
+
+  min-width: 0;
+
+  border-bottom: 1px solid #303033;
+
+  transition: background-color 0.2s ease;
+}
+
+.team-activity-item:last-child {
+  border-bottom: none;
+}
+
+.team-activity-item:hover {
+  background-color: #202023;
+}
+
+/* =========================================
+   CHECKBOX ICON
+========================================= */
+
+.checkbox-activity-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+}
+
+.checkbox-activity-icon svg {
+  width: 22px;
+  height: 22px;
+
+  stroke-width: 1.8;
+}
+
+/* CHECKED */
+
+.checkbox-activity-icon.is-checked {
+  color: #22c55e;
+
+  background: rgba(34, 197, 94, 0.10);
+
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+/* UNCHECKED */
+
+.checkbox-activity-icon.is-unchecked {
+  color: #ef4524;
+
+  background: rgba(239, 69, 36, 0.10);
+
+  border: 1px solid rgba(239, 69, 36, 0.25);
+}
+
+/* =========================================
+   ACTIVITY CONTENT
+========================================= */
+
+.team-activity-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  flex: 1;
+
+  gap: 5px;
+
+  min-width: 0;
+}
+
+/* =========================================
+   RECORD NAME
+========================================= */
+
+.team-activity-title {
+  display: block;
+
+  color: #f5f5f5;
+
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 600;
+
+  line-height: 1.3;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================
+   CHECKBOX FIELD
+========================================= */
+
+.team-activity-field {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 0;
+
+  color: #c4c4cc;
+
+  font-size: clamp(10px, 0.85vw, 13px);
+
+  line-height: 1.2;
+}
+
+.activity-field-name {
+  min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================
+   PFAS / SMA CATEGORY
+========================================= */
+
+.activity-category {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 2px 7px;
+
+  border-radius: 4px;
+
+  background: rgba(239, 69, 36, 0.12);
+
+  border: 1px solid rgba(239, 69, 36, 0.25);
+
+  color: #ef4524;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+/* =========================================
+   CHECKBOX STATUS
+========================================= */
+
+.team-activity-description {
+  color: #92929c;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-checked-text {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.activity-unchecked-text {
+  color: #ef4524;
+  font-weight: 600;
+}
+
+/* =========================================
+   ACTIVITY DATE
+========================================= */
+
+.team-activity-date {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  color: #a1a1aa;
+
+  font-size: clamp(9px, 0.75vw, 12px);
+
+  white-space: nowrap;
+}
+
+.team-activity-date svg {
+  width: 13px;
+  height: 13px;
+
+  flex-shrink: 0;
+
+  color: #ef4524;
+}
+
+/* =========================================
+   ACTIVITY FOOTER
+========================================= */
+
+.team-activity-footer {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 8px 14px;
+
+  border-top: 1px solid #303033;
+
+  color: #92929c;
+
+  font-size: 11px;
+
+  flex-shrink: 0;
+}
+
+.team-activity-footer svg {
+  width: 13px;
+  height: 13px;
+
+  color: #22c55e;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.recent-activity .activity-empty {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 1;
+
+  gap: 8px;
+
+  padding: 15px;
+
+  text-align: center;
+}
+
+.recent-activity .activity-empty > svg {
+  width: 26px;
+  height: 26px;
+
+  color: #ef4524;
+}
+
+.recent-activity .activity-empty strong {
+  color: #f5f5f5;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recent-activity .activity-empty p {
+  margin: 0;
+
+  color: #92929c;
+
+  font-size: 12px;
+}
+
+/* =========================================
+   VIEW ALL
+========================================= */
+
+.view-all-link {
+  color: #ef4524;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: #ff6947;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.recent-activity .field-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 10px 14px;
+
+  border-top: 1px solid #303033;
+}
+
+.recent-activity .field-pagination button {
+  padding: 6px 12px;
+
+  border: 1px solid #3c3c40;
+  border-radius: 5px;
+
+  background: #242426;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.recent-activity .field-pagination button:hover {
+  border-color: #ef4524;
+  color: #ef4524;
+}
+
+.recent-activity .field-pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.recent-activity .field-pagination span {
+  color: #a1a1aa;
+  font-size: 11px;
+}
+
+/* =========================================
+   REFRESH ANIMATION
+========================================= */
+
+.activity-spinning {
+  animation: activitySpin 1s linear infinite;
+}
+
+@keyframes activitySpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   RESPONSIVE DESKTOP
+========================================= */
+
+@media (max-width: 1200px) {
+
+  .team-activity-item {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .checkbox-activity-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .checkbox-activity-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .team-activity-date {
+    font-size: 9px;
+  }
+
+}
+
+/* =========================================
+   COMPACT TV DISPLAY
+========================================= */
+
+@media (max-height: 800px) {
+
+  .team-activity-item {
+    padding: 5px 10px;
+    gap: 8px;
+  }
+
+  .team-activity-content {
+    gap: 3px;
+  }
+
+  .team-activity-title {
+    font-size: 12px;
+  }
+
+  .team-activity-field {
+    font-size: 10px;
+  }
+
+  .team-activity-description {
+    font-size: 10px;
+  }
+
+  .activity-category {
+    padding: 1px 5px;
+    font-size: 9px;
+  }
+
+  .checkbox-activity-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .checkbox-activity-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .team-activity-footer {
+    padding: 5px 10px;
+  }
+
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .team-activity-item {
+    flex-wrap: wrap;
+  }
+
+  .team-activity-content {
+    flex-basis: calc(100% - 55px);
+  }
+
+  .team-activity-date {
+    width: 100%;
+    padding-left: 42px;
+  }
+
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .activity-spinning {
+    animation: none;
+  }
+
 }
