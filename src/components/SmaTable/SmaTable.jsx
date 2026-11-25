@@ -55,7 +55,7 @@ const COLUMNS = [
   }
 ];
 
-function SmaTable({ records, loading, error }) {
+function SmaTable({ records, loading, error, viewport }) {
   return (
     <CaseTable
       id="sma"
@@ -64,6 +64,7 @@ function SmaTable({ records, loading, error }) {
       icon={ClipboardList}
       columns={COLUMNS}
       records={records}
+      viewport={viewport}
       loading={loading}
       error={error}
     />

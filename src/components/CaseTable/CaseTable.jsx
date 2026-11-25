@@ -14,13 +14,24 @@ function RecordStatus({ complete }) {
   );
 }
 
-function CaseTable({ id, title, description, icon: Icon, columns, records = [], loading, error }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(PAGE_SIZES[0]);
+function CaseTable({ id, title, description, icon: Icon, columns, records = [], loading, error, viewport }) {
+  const [firstRecord, setFirstRecord] = useState(0);
+  const [firstField, setFirstField] = useState(0);
+  const [rowLimit, setRowLimit] = useState(PAGE_SIZES[0]);
+
+  const fieldsPerPage = Math.max(1, Math.floor(viewport.width / 136) - 1);
+  const fieldPageCount = Math.ceil((columns.length - 1) / fieldsPerPage);
+  const fieldPage = Math.min(Math.floor(firstField / fieldsPerPage), fieldPageCount - 1);
+  const fieldOffset = fieldPage * fieldsPerPage;
+  const visibleColumns = [columns[0], ...columns.slice(fieldOffset + 1, fieldOffset + 1 + fieldsPerPage)];
+  const footerSpace = viewport.width < 540 ? 235 : 175;
+  const rowCapacity = Math.min(100, Math.max(1, Math.floor((viewport.height - footerSpace) / 55)));
+  const rowsPerPage = Math.min(rowLimit, rowCapacity);
+  const availableSizes = [...new Set([...PAGE_SIZES.filter((size) => size <= rowCapacity), rowCapacity])];
 
   const totalRecords = records.length;
   const totalPages = Math.max(1, Math.ceil(totalRecords / rowsPerPage));
-  const page = Math.min(currentPage, totalPages);
+  const page = Math.min(Math.floor(firstRecord / rowsPerPage) + 1, totalPages);
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = Math.min(startIndex + rowsPerPage, totalRecords);
   const firstPage = Math.max(1, Math.min(page - 2, totalPages - MAX_VISIBLE_PAGES + 1));
@@ -31,6 +42,10 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
   const totalLabel = countFormatter.format(totalRecords);
   const rowsLabelId = id + "-rows-per-page";
   const titleId = id + "-title";
+
+  function goToPage(nextPage) {
+    setFirstRecord((nextPage - 1) * rowsPerPage);
+  }
 
   return (
     <section className={`case-table-card ${id}-table-card`} aria-labelledby={titleId}>
@@ -52,39 +67,37 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
 
       {totalRecords > 0 ? (
         <>
-          <div className="table-scroll" tabIndex={0} role="region" aria-label={`${title} case table`}>
-            <table className="case-table" aria-labelledby={titleId}>
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column.key} scope="col">{column.label}</th>
+          <table className="case-table" aria-labelledby={titleId}>
+            <thead>
+              <tr>
+                {visibleColumns.map((column) => (
+                  <th key={column.key} scope="col">{column.label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {records.slice(startIndex, endIndex).map((record, index) => (
+                <tr key={record.rowNumber ?? startIndex + index}>
+                  {visibleColumns.map((column) => (
+                    <td key={column.key} className={column.key === "caseNumber" ? "case-number" : undefined}>
+                      {column.checkbox ? (
+                        <RecordStatus complete={record[column.key]} />
+                      ) : (
+                        record[column.key] || "\u2014"
+                      )}
+                    </td>
                   ))}
                 </tr>
-              </thead>
-              <tbody>
-                {records.slice(startIndex, endIndex).map((record, index) => (
-                  <tr key={record.rowNumber ?? startIndex + index}>
-                    {columns.map((column) => (
-                      <td key={column.key} className={column.key === "caseNumber" ? "case-number" : undefined}>
-                        {column.checkbox ? (
-                          <RecordStatus complete={record[column.key]} />
-                        ) : (
-                          record[column.key] || "\u2014"
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
 
           <div className="table-pagination">
             <span aria-live="polite">
               {countFormatter.format(startIndex + 1)}&ndash;{countFormatter.format(endIndex)} of {totalLabel} records
             </span>
             <nav className="pagination-controls" aria-label={`${title} pagination`}>
-              <button type="button" onClick={() => setCurrentPage(page - 1)} disabled={page === 1}>
+              <button type="button" onClick={() => goToPage(page - 1)} disabled={page === 1}>
                 Previous
               </button>
               <div className="pagination-pages">
@@ -92,7 +105,7 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
                   <button
                     type="button"
                     key={pageNumber}
-                    onClick={() => setCurrentPage(pageNumber)}
+                    onClick={() => goToPage(pageNumber)}
                     aria-label={`Go to page ${pageNumber}`}
                     aria-current={page === pageNumber ? "page" : undefined}
                   >
@@ -100,7 +113,7 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
                   </button>
                 ))}
               </div>
-              <button type="button" onClick={() => setCurrentPage(page + 1)} disabled={page === totalPages}>
+              <button type="button" onClick={() => goToPage(page + 1)} disabled={page === totalPages}>
                 Next
               </button>
             </nav>
@@ -112,16 +125,25 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
                   id={rowsLabelId}
                   value={rowsPerPage}
                   onChange={(event) => {
-                    setRowsPerPage(Number(event.target.value));
-                    setCurrentPage(1);
+                    setRowLimit(Number(event.target.value));
+                    setFirstRecord(0);
                   }}
                 >
-                  {PAGE_SIZES.map((size) => <option key={size} value={size}>{size}</option>)}
+                  {[...new Set([...availableSizes, rowsPerPage])].sort((a, b) => a - b).map((size) => (
+                    <option key={size} value={size}>{size}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} aria-hidden="true" />
               </div>
             </div>
           </div>
+          {fieldPageCount > 1 && (
+            <nav className="table-pagination field-pagination" aria-label={`${title} field groups`}>
+              <button type="button" disabled={fieldPage === 0} onClick={() => setFirstField(fieldOffset - fieldsPerPage)}>Previous fields</button>
+              <span aria-live="polite">Fields {fieldPage + 1} of {fieldPageCount}</span>
+              <button type="button" disabled={fieldPage === fieldPageCount - 1} onClick={() => setFirstField(fieldOffset + fieldsPerPage)}>Next fields</button>
+            </nav>
+          )}
         </>
       ) : (
         <p className="table-empty" role="status">

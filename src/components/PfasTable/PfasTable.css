@@ -1,5 +1,4 @@
 ﻿.pfas-table-card {
   --table-accent: var(--accent);
   --table-accent-soft: var(--accent-soft);
-  --table-min-width: 49rem;
 }

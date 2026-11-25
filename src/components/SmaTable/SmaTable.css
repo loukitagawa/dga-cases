@@ -1,9 +1,4 @@
 ﻿.sma-table-card {
   --table-accent: var(--blue);
   --table-accent-soft: var(--blue-soft);
-  --table-min-width: 111rem;
-}
-
-.sma-table-card .case-table th {
-  min-width: 7rem;
 }

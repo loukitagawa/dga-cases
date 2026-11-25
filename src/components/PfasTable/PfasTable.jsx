@@ -12,7 +12,7 @@ const COLUMNS = [
   { key: "filed", label: "Filed", checkbox: true }
 ];
 
-function PfasTable({ records, loading, error }) {
+function PfasTable({ records, loading, error, viewport }) {
   return (
     <CaseTable
       id="pfas"
@@ -21,6 +21,7 @@ function PfasTable({ records, loading, error }) {
       icon={Files}
       columns={COLUMNS}
       records={records}
+      viewport={viewport}
       loading={loading}
       error={error}
     />
