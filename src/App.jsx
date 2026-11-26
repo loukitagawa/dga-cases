@@ -36,7 +36,8 @@ function App() {
     const naturalWidth = content.scrollWidth;
     const scale = Math.min(1, width / Math.max(1, naturalWidth), height / Math.max(1, content.scrollHeight));
     // Make room horizontally before scaling a home dashboard that's too tall.
-    const canWiden = frame.parentElement.dataset.page === "home" && naturalWidth <= width;
+    const canWiden = ["home", "pfas", "sma"].includes(frame.parentElement.dataset.page) &&
+      naturalWidth <= width;
     if (canWiden && scale > 0 && scale < 1) {
       content.style.setProperty("--page-fit-width", `${width / scale}px`);
       content.style.setProperty("--page-fit-height", `${height / scale}px`);
@@ -70,7 +71,7 @@ function App() {
         <div className="dashboard-viewport" ref={viewportRef}>
           <div className="dashboard-page" ref={contentRef}>
             {page === "home" && (
-              <Header summary={data.summary} activities={data.activities} loading={loading} error={error} />
+              <Header summary={data.summary} loading={loading} error={error} />
             )}
             {error && <div className="api-error" role="alert">{error}</div>}
             {page === "pfas" && <PfasTable records={data.pfas} loading={loading} error={error} viewport={viewport} />}
@@ -78,7 +79,7 @@ function App() {
             {page === "activity" && (
               <div className="activity-page">
                 <h1 tabIndex={-1}>Activity Logs</h1>
-                <RecentActivity activities={data.activities} loading={loading} error={error} pageSize={Math.max(1, Math.floor((viewport.height - 145) / 50))} />
+                <RecentActivity pageSize={Math.max(1, Math.floor((viewport.height - 145) / 50))} />
               </div>
             )}
           </div>

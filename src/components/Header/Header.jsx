@@ -878,9 +878,7 @@ function ActivityItem({
 // AUTOMATIC ACTIVITY ROTATION
 // ==========================================
 
-export function RecentActivity({
-  pageSize
-}) {
+export function RecentActivity({ pageSize }) {
   const {
     activities,
     loading,
@@ -999,11 +997,7 @@ export function RecentActivity({
     >
 
       <PanelHeading
-        title={
-          pageSize
-            ? "Team Activity"
-            : "Recent Team Activity"
-        }
+        title="Recent Team Activity"
         icon={History}
       >
 

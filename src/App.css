@@ -92,6 +92,17 @@ body {
   transform-origin: top left;
 }
 
+.dashboard:is([data-page="pfas"], [data-page="sma"]) .dashboard-page {
+  width: var(--page-fit-width, auto);
+  min-height: var(--page-fit-height, auto);
+  transform-origin: top left;
+}
+
+.dashboard[data-page="activity"] .dashboard-page {
+  display: flex;
+  min-height: 100%;
+}
+
 @media (min-width: 701px) {
   .app-shell:has(.app-sidebar[data-minimized="true"]) {
     grid-template-columns: 2.75rem minmax(0, 1fr);
@@ -126,12 +137,14 @@ body {
 }
 
 .case-table-card {
+  --unit: clamp(1px, 0.125cqi, 1.6px);
+  --card-border: #29292b;
+  --card-background: #171719;
+  --table-row-alt: #1b1b1d;
+  --table-row-hover: #202022;
+
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
-  box-shadow: 0 10px 24px rgb(0 0 0 / 13%);
 }
 
 .case-table-heading,
@@ -141,11 +154,16 @@ body {
 }
 
 .case-table-heading {
+  position: relative;
+  isolation: isolate;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--line);
+  min-height: clamp(calc(84 * var(--unit)), calc(100cqi * 193 / 2172), calc(95 * var(--unit)));
+  padding: calc(13 * var(--unit)) calc(14 * var(--unit));
+  border-bottom: 0;
+  background: #100c0a;
+  overflow: hidden;
 }
 
 .case-table-title {
@@ -166,24 +184,24 @@ body {
 
 .case-table-heading h1 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.2;
+  font-size: calc(23 * var(--unit));
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
 }
 
 .case-table-heading p {
-  margin: 3px 0 0;
+  margin: calc(4 * var(--unit)) 0 0;
   color: var(--muted);
-  font-size: 0.875rem;
-  line-height: 1.4;
+  font-size: calc(10 * var(--unit));
+  line-height: 1.35;
 }
 
 .table-record-label {
   padding: 5px 9px;
-  border: 1px solid var(--line);
+  border: 1px solid #343438;
   border-radius: 7px;
-  background: var(--surface-inset);
+  background: #19191b;
   color: var(--text);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -205,8 +223,8 @@ body {
 }
 
 .case-table th {
-  border-bottom: 1px solid var(--line);
-  background: var(--surface-inset);
+  border-bottom: 1px solid var(--card-border);
+  background: #131315;
   color: var(--muted);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -214,23 +232,33 @@ body {
 }
 
 .case-table td {
-  border-bottom: 1px solid var(--line);
+  height: 55px;
+  padding-block: 8px;
+  border-bottom: 1px solid var(--card-border);
   background: var(--row-surface);
   color: var(--text);
   font-size: 0.875rem;
-  line-height: 1.4;
+  line-height: 1.35;
+}
+
+.case-table-cell-value {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .case-table tbody tr {
-  --row-surface: var(--surface);
+  --row-surface: var(--card-background);
 }
 
 .case-table tbody tr:nth-child(even) {
-  --row-surface: #161e29;
+  --row-surface: var(--table-row-alt);
 }
 
 .case-table tbody tr:hover {
-  --row-surface: var(--surface-raised);
+  --row-surface: var(--table-row-hover);
 }
 
 .case-table tbody tr:last-child td {
@@ -239,7 +267,7 @@ body {
 
 .case-table th:first-child,
 .case-table td:first-child {
-  border-inline-end: 1px solid var(--line);
+  border-inline-end: 1px solid var(--card-border);
 }
 
 .case-table td:first-child {
@@ -248,7 +276,7 @@ body {
 }
 
 .case-table .case-number {
-  color: var(--blue);
+  color: var(--table-accent);
   font-family: ui-monospace, Consolas, monospace;
   font-size: 0.875rem;
 }
@@ -297,6 +325,10 @@ body {
   color: var(--muted);
 }
 
+.case-table-card .table-pagination {
+  border-top-color: var(--card-border);
+}
+
 .field-pagination {
   justify-content: center;
 }
@@ -327,6 +359,12 @@ body {
   cursor: pointer;
 }
 
+.case-table-card .table-pagination button,
+.case-table-card .table-page-size select {
+  border-color: #343438;
+  background: #131315;
+}
+
 .pagination-pages button {
   min-width: 36px;
   font-variant-numeric: tabular-nums;
@@ -338,6 +376,12 @@ body {
   background: var(--surface-raised);
 }
 
+.case-table-card .table-pagination button:hover:enabled,
+.case-table-card .table-page-size select:hover {
+  border-color: var(--table-accent);
+  background: var(--table-row-hover);
+}
+
 .table-pagination button[aria-current="page"] {
   border-color: var(--line-strong);
   background: var(--blue-soft);
@@ -345,11 +389,21 @@ body {
   font-weight: 650;
 }
 
+.case-table-card .table-pagination button[aria-current="page"] {
+  border-color: var(--table-accent);
+  background: var(--table-accent-soft);
+  color: var(--table-accent);
+}
+
 .table-pagination button:disabled {
   border-color: var(--line);
   color: var(--muted);
   opacity: 0.65;
   cursor: default;
+}
+
+.case-table-card .table-pagination button:disabled {
+  border-color: #29292b;
 }
 
 .table-page-size {
@@ -375,12 +429,12 @@ body {
 
 @media (max-width: 760px) {
   .case-table-heading {
-    padding: 14px 16px;
+    padding: calc(13 * var(--unit)) calc(14 * var(--unit));
   }
 
   .case-table th,
   .case-table td {
-    padding: 10px 12px;
+    padding-inline: 12px;
   }
 
   .pagination-controls {

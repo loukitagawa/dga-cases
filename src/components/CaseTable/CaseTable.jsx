@@ -34,6 +34,8 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
   const page = Math.min(Math.floor(firstRecord / rowsPerPage) + 1, totalPages);
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = Math.min(startIndex + rowsPerPage, totalRecords);
+  const pageRecords = records.slice(startIndex, endIndex);
+  const placeholderCount = rowsPerPage - pageRecords.length;
   const firstPage = Math.max(1, Math.min(page - 2, totalPages - MAX_VISIBLE_PAGES + 1));
   const visiblePages = Array.from(
     { length: Math.min(MAX_VISIBLE_PAGES, totalPages) },
@@ -48,9 +50,9 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
   }
 
   return (
-    <section className={`case-table-card ${id}-table-card`} aria-labelledby={titleId}>
-      <div className="case-table-heading">
-        <div className="case-table-title">
+    <section className={`pacer-card case-table-card ${id}-table-card`} aria-labelledby={titleId}>
+      <div className="case-table-heading header-intro tv-header-intro">
+        <div className="case-table-title tv-header-copy">
           <span className="case-table-symbol">
             <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
           </span>
@@ -63,6 +65,7 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
         <span className="table-record-label">
           {loading ? "Loading" : error ? "Unavailable" : `${totalLabel} ${totalRecords === 1 ? "record" : "records"}`}
         </span>
+        <div className="tv-banner-line" aria-hidden="true" />
       </div>
 
       {totalRecords > 0 ? (
@@ -76,17 +79,24 @@ function CaseTable({ id, title, description, icon: Icon, columns, records = [], 
               </tr>
             </thead>
             <tbody>
-              {records.slice(startIndex, endIndex).map((record, index) => (
+              {pageRecords.map((record, index) => (
                 <tr key={record.rowNumber ?? startIndex + index}>
                   {visibleColumns.map((column) => (
                     <td key={column.key} className={column.key === "caseNumber" ? "case-number" : undefined}>
                       {column.checkbox ? (
                         <RecordStatus complete={record[column.key]} />
                       ) : (
-                        record[column.key] || "\u2014"
+                        <span className="case-table-cell-value" title={record[column.key] || undefined}>
+                          {record[column.key] || "\u2014"}
+                        </span>
                       )}
                     </td>
                   ))}
+                </tr>
+              ))}
+              {Array.from({ length: placeholderCount }, (_, index) => (
+                <tr key={`placeholder-${page}-${index}`} className="case-table-placeholder" aria-hidden="true">
+                  {visibleColumns.map((column) => <td key={column.key} />)}
                 </tr>
               ))}
             </tbody>
